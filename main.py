@@ -1,45 +1,29 @@
 from fastapi import FastAPI
 import uvicorn
-from typing import Union
-from pydantic import BaseModel
-from file_workers import JsonFileWorker
-
+from file_workers import DataWorker
 
 app = FastAPI()
 
-file_object = JsonFileWorker('data.jsonl')
-
-# class Item(BaseModel):
-#     name: str
-#     price: float
-#     is_offer: Union[bool, None] = None
-#
-# @app.put("/items/{item_id}")
-# def update_item(item_id: int, item: Item):
-#     return {"item_name": item.name, "item_id": item_id}
+file_object = DataWorker('data.jsonl')
 
 
-@app.get('/{ind}')
-def get_record(ind: Union[str, int]):
-    if ind == 'all':
-        return file_object.data
-    return f"Need idea for unique identificator: {ind}"
+@app.get('/get/{ind}')
+def get_record(ind: str):
+    return file_object.get_record(ind)
 
-@app.post('/')
+@app.post('/add/')
 def create_record(data):
-    pass
+    return file_object.create_record(data)
 
-@app.put('/{ind}')
-def update_record(dara):
-    pass
+@app.put('/change/{ind}')
+def update_record(ind, data):
+    return file_object.update_record(ind, data)
 
-@app.delete('/{ind}')
-def delete_record(ind: Union[str, int]):
-    if ind == 'all':
-        file_object.data = []
-    return f"Need idea for unique identificator: {ind}"
+@app.delete('/delete/{ind}')
+def delete_record(ind: str):
+    return file_object.delete_record(ind)
 
 
 if __name__ == '__main__':
-    uvicorn.run('main:app', host='127.0.0.1', port=8765, reload=True)
+    uvicorn.run('main:app', host='127.0.0.1', port=8765, reload=True, workers=1)
 
