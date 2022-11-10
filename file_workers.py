@@ -1,5 +1,6 @@
 import json
 from collections import defaultdict
+import copy
 
 
 class FileReaderAndWriter:
@@ -44,28 +45,56 @@ class DatabaseImitation(JsonLinesConverter):
 class DataWorker(DatabaseImitation):
     def get_record(self, ind):
         self.load_data()
+
         if ind == 'all':
+            if not self.data:
+                return {"Message": "No records."}
             return self.data
+
         return self.db[ind] if self.db[ind] else {"message": "Record not found"}
 
     def update_record(self, ind, data):
         self.load_data()
-        pass
+
+        if ind not in self.db:
+            return {"Error": "Record not found"}
+
+        data.pop('name', None)
+        data.pop('time_created', None)
+        old_rec = copy.deepcopy(self.db[ind])
+        for rec in self.db[ind]:
+            rec.update(data)
+        self.dump_data()
+
+        return {"Updated": {'old record': old_rec, "new record": self.db[ind]}}
 
     def create_record(self, data):
-        pass
+        self.load_data()
+        if 'name' not in data.keys() or 'time_created' not in data.keys():
+            return {"Error": "Missing one or both of required fields: 'name', 'time_created'"}
+
+        record_id = data['name'] + str(data['time_created'])
+
+        if record_id in self.db.keys():
+            return {"Error": "Record already exists"}
+
+        self.db[record_id] = [data]
+        self.dump_data()
+
+        return {"Record created": data}
 
     def delete_record(self, ind):
         if ind == 'all':
             self.db = {}
             self.dump_data()
-            return {"message": "All records deleted!"}
+            return {"Message": "All records deleted!"}
 
         self.load_data()
         record = self.db[ind][:]
         del self.db[ind]
         self.dump_data()
-        return {"deleted": record} if record else {"message": "Nothing to delete, record not exists"}
+
+        return {"Deleted": record} if record else {"Message": "Nothing to delete, record not exists"}
 
 
 
