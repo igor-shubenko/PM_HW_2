@@ -11,7 +11,7 @@ file_object = DataWorker('data.jsonl')
 def get_record(ind: str):
     return file_object.get_record(ind)
 
-@app.post('/add/')
+@app.post('/add')
 def create_record(data: Union[dict, None]=Body()):
     return file_object.create_record(data)
 
