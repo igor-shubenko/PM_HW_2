@@ -1,11 +1,15 @@
 from fastapi import FastAPI, Body
 import uvicorn
-from file_workers import DataWorker
 from typing import Union
+
+from file_workers import DataWorker
+# from file_workers import DataWorkerByIndex
+
 
 app = FastAPI()
 
 file_object = DataWorker('data.jsonl')
+# file_object = DataWorkerByIndex('data.jsonl')
 
 @app.get('/get/{ind}')
 def get_record(ind: str):
@@ -16,7 +20,7 @@ def create_record(data: Union[dict, None]=Body()):
     return file_object.create_record(data)
 
 @app.put('/change/{ind}')
-def update_record(ind, data: Union[dict, None]=Body()):
+def update_record(ind: str, data: Union[dict, None]=Body()):
     return file_object.update_record(ind, data)
 
 @app.delete('/delete/{ind}')
