@@ -81,8 +81,8 @@ class DataWorker(DatabaseImitation):
 
     def create_record(self, data):
         """Creates new record, if unique identificator does not exist"""
-        if 'name' not in data.keys() or 'time_created' not in data.keys():
-            return {"Error": "Missing one or both of required fields: 'name', 'time_created'"}
+        if not all(map(lambda x: x in data.keys(), ('name', 'time_created', 'age'))):
+            return {"Error": "Missing one or both of required fields: 'name', 'time_created', 'age'"}
 
         self.load_data()
         record_id = data['name'] + str(data['time_created'])
@@ -168,8 +168,8 @@ class DataWorkerByIndex(JsonLinesConverter):
 
     def create_record(self, data):
         """Creates new record"""
-        if 'name' not in data.keys() or 'time_created' not in data.keys():
-            return {"Error": "Missing one or both of required fields: 'name', 'time_created'"}
+        if not all(map(lambda x: x in data.keys(), ('name', 'time_created', 'age'))):
+            return {"Error": "Missing one or both of required fields: 'name', 'time_created', 'age'"}
 
         self.load_data()
         self._data.append(data)

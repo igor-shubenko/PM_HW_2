@@ -5,23 +5,27 @@ from typing import Union
 from file_workers import DataWorker
 # from file_workers import DataWorkerByIndex
 
-
 app = FastAPI()
 
-file_object = DataWorker('data.jsonl')
-# file_object = DataWorkerByIndex('data.jsonl')
+file_path = 'data.jsonl'
+file_object = DataWorker(file_path)
+# file_object = DataWorkerByIndex(file_path)
+
 
 @app.get('/get/{ind}')
 def get_record(ind: str):
     return file_object.get_record(ind)
 
+
 @app.post('/add')
-def create_record(data: Union[dict, None]=Body()):
+def create_record(data: Union[dict, None] = Body()):
     return file_object.create_record(data)
+
 
 @app.put('/change/{ind}')
 def update_record(ind: str, data: Union[dict, None]=Body()):
     return file_object.update_record(ind, data)
+
 
 @app.delete('/delete/{ind}')
 def delete_record(ind: str):
